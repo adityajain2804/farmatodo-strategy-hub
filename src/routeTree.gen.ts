@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CampaignRouteImport } from './routes/campaign'
 import { Route as CausalRouteImport } from './routes/causal'
+import { Route as GraphRouteImport } from './routes/graph'
 import { Route as ScenarioRouteImport } from './routes/scenario'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const CausalRoute = CausalRouteImport.update({
   path: '/causal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GraphRoute = GraphRouteImport.update({
+  id: '/graph',
+  path: '/graph',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScenarioRoute = ScenarioRouteImport.update({
   id: '/scenario',
   path: '/scenario',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/campaign': typeof CampaignRoute
   '/causal': typeof CausalRoute
+  '/graph': typeof GraphRoute
   '/scenario': typeof ScenarioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/campaign': typeof CampaignRoute
   '/causal': typeof CausalRoute
+  '/graph': typeof GraphRoute
   '/scenario': typeof ScenarioRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/campaign': typeof CampaignRoute
   '/causal': typeof CausalRoute
+  '/graph': typeof GraphRoute
   '/scenario': typeof ScenarioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/campaign' | '/causal' | '/scenario'
+  fullPaths: '/' | '/campaign' | '/causal' | '/graph' | '/scenario'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/campaign' | '/causal' | '/scenario'
-  id: '__root__' | '/' | '/campaign' | '/causal' | '/scenario'
+  to: '/' | '/campaign' | '/causal' | '/graph' | '/scenario'
+  id: '__root__' | '/' | '/campaign' | '/causal' | '/graph' | '/scenario'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CampaignRoute: typeof CampaignRoute
   CausalRoute: typeof CausalRoute
+  GraphRoute: typeof GraphRoute
   ScenarioRoute: typeof ScenarioRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CausalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/graph': {
+      id: '/graph'
+      path: '/graph'
+      fullPath: '/graph'
+      preLoaderRoute: typeof GraphRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scenario': {
       id: '/scenario'
       path: '/scenario'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CampaignRoute: CampaignRoute,
   CausalRoute: CausalRoute,
+  GraphRoute: GraphRoute,
   ScenarioRoute: ScenarioRoute,
 }
 export const routeTree = rootRouteImport
