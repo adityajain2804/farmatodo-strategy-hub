@@ -294,3 +294,249 @@ export const fmtMoney = (n: number, symbol = "$") => {
 };
 
 export const fmtUnits = (n: number) => (Math.abs(n) >= 1000 ? `${(n / 1000).toFixed(1)}K` : n.toFixed(0));
+
+// ---------------- Phase 3 ontology / knowledge graph ----------------
+
+export type GraphNodeType =
+  | "Customer" | "Product" | "Category" | "Campaign" | "Offer" | "Season"
+  | "Channel" | "Segment" | "Constraint" | "Supplier" | "Incrementality Result" | "Causal Effect";
+
+export type GraphNode = {
+  id: string;
+  type: GraphNodeType;
+  label: string;
+  x: number;
+  y: number;
+  props: Record<string, string>;
+};
+
+export type GraphEdge = { from: string; to: string; label: string };
+
+export const GRAPH_NODES: GraphNode[] = [
+  { id: "cust", type: "Customer", label: "C001 · Champion", x: 90, y: 250, props: { Segment: "Champion", "Behavioral Cluster": "Premium Loyal", Country: "Colombia", "Lifetime Orders": "48", Affinity: "0.81 (Personal Care)" } },
+  { id: "seg", type: "Segment", label: "Champion", x: 90, y: 90, props: { Members: "148,320", "Avg. Baseline Units": "0.82", "Redemption Rate": "41.2%" } },
+  { id: "prod", type: "Product", label: "Nivea Body Lotion 400ml", x: 330, y: 250, props: { SKU: "SKU-4412", Brand: "Nivea", "Regular Price": "$40.00", "Competitor Gap": "-4.2%" } },
+  { id: "sub", type: "Product", label: "Dove Body Lotion 400ml", x: 330, y: 410, props: { SKU: "SKU-3320", Brand: "Dove", "Substitution Strength": "0.62", "Margin Loss": "$400" } },
+  { id: "cat", type: "Category", label: "Personal Care", x: 330, y: 90, props: { SKUs: "1,284", "Avg. Dose CATE": "+0.38", "Recommended Depth": "15%" } },
+  { id: "camp", type: "Campaign", label: "Mid-Year Reactivation", x: 570, y: 170, props: { Type: "Personalized", Country: "Colombia", Window: "30 Jun → 21 Jul", Budget: "$180K" } },
+  { id: "season", type: "Season", label: "Mid-Year", x: 570, y: 40, props: { Window: "Jun → Jul", "Seasonality Index": "1.14" } },
+  { id: "chan", type: "Channel", label: "eCommerce", x: 570, y: 410, props: { "Share of Promo Revenue": "31.4%", "Fill Rate": "96.1%" } },
+  { id: "offer", type: "Offer", label: "15% Regular / 20% Prime", x: 810, y: 250, props: { "Regular Discount": "15%", "Prime Discount": "20%", "Expected NIM": "$2.10", Confidence: "High" } },
+  { id: "constraint", type: "Constraint", label: "Supplier Cap 20%", x: 1050, y: 150, props: { Source: "Supplier Agreement", Cap: "20%", Status: "Binding" } },
+  { id: "supplier", type: "Supplier", label: "Beiersdorf LATAM", x: 1050, y: 30, props: { Agreement: "FT-BD-2026-04", "Funding Committed": "$1,500 / week" } },
+  { id: "cate", type: "Causal Effect", label: "CATE · Dose +0.41", x: 810, y: 410, props: { "Exposure CATE": "+0.06", "Dose CATE": "+0.41", "Model Version": "causal-dml-v2.7", Confidence: "89%" } },
+  { id: "incr", type: "Incrementality Result", label: "Measured Incrementality", x: 1050, y: 330, props: { "Actual Inc. Units": "+0.44", "Predicted": "+0.47", "NIM Variance": "-6.4%", "Pull-Forward": "9.4%" } },
+];
+
+export const GRAPH_EDGES: GraphEdge[] = [
+  { from: "cust", to: "seg", label: "belongsTo" },
+  { from: "cust", to: "prod", label: "hasAffinity" },
+  { from: "prod", to: "cat", label: "partOf" },
+  { from: "prod", to: "sub", label: "hasSubstitute" },
+  { from: "cat", to: "camp", label: "targetedBy" },
+  { from: "camp", to: "season", label: "runsIn" },
+  { from: "camp", to: "chan", label: "deliveredVia" },
+  { from: "camp", to: "offer", label: "contains" },
+  { from: "cust", to: "offer", label: "respondsTo" },
+  { from: "offer", to: "constraint", label: "constrainedBy" },
+  { from: "constraint", to: "supplier", label: "issuedBy" },
+  { from: "offer", to: "cate", label: "hasCATE" },
+  { from: "camp", to: "incr", label: "measuredBy" },
+];
+
+export const GRAPH_NODE_TONE: Record<GraphNodeType, string> = {
+  Customer: "primary",
+  Segment: "primary",
+  Product: "success",
+  Category: "success",
+  Campaign: "warning",
+  Season: "warning",
+  Channel: "warning",
+  Offer: "primary",
+  Constraint: "danger",
+  Supplier: "danger",
+  "Causal Effect": "violet",
+  "Incrementality Result": "violet",
+};
+
+export type QueryResult = {
+  query: string;
+  entities: { type: string; label: string }[];
+  relationships: string[];
+  kpis: { label: string; value: string }[];
+  sourceTable: string;
+  modelVersion: string;
+  confidence: string;
+  highlight: string[];
+};
+
+export const QUERY_RESULTS: Record<string, QueryResult> = {
+  [QUERY_TEMPLATES[0]]: {
+    query: QUERY_TEMPLATES[0],
+    entities: [
+      { type: "Segment", label: "Champion" },
+      { type: "Customer", label: "18,402 customers" },
+      { type: "Campaign", label: "Beauty Week, Flash Sale Q3" },
+      { type: "Product", label: "Cetaphil Gentle Cleanser" },
+    ],
+    relationships: ["Customer belongsTo Segment", "Customer respondsTo Offer", "Product hasSubstitute Product"],
+    kpis: [
+      { label: "Customers matched", value: "18,402" },
+      { label: "Avg. discount depth", value: "24.6%" },
+      { label: "Avg. cannibalization", value: "22.8%" },
+      { label: "Cannib. margin loss", value: "$186K" },
+    ],
+    sourceTable: "ft_causal.customer_offer_response_v3",
+    modelVersion: "causal-dml-v2.7",
+    confidence: "88%",
+    highlight: ["cust", "seg", "prod", "sub"],
+  },
+  [QUERY_TEMPLATES[1]]: {
+    query: QUERY_TEMPLATES[1],
+    entities: [
+      { type: "Campaign", label: "Beauty Week" },
+      { type: "Constraint", label: "Supplier Cap 20%" },
+      { type: "Supplier", label: "Beiersdorf LATAM, Galderma" },
+    ],
+    relationships: ["Campaign contains Offer", "Offer constrainedBy Constraint", "Constraint issuedBy Supplier"],
+    kpis: [
+      { label: "Breaching campaigns", value: "3" },
+      { label: "Offers above cap", value: "12" },
+      { label: "Max overshoot", value: "+5 pp" },
+      { label: "Exposed margin", value: "$74K" },
+    ],
+    sourceTable: "ft_governance.constraint_breach_log",
+    modelVersion: "constraint-engine-v1.9",
+    confidence: "100%",
+    highlight: ["camp", "offer", "constraint", "supplier"],
+  },
+  [QUERY_TEMPLATES[2]]: {
+    query: QUERY_TEMPLATES[2],
+    entities: [
+      { type: "Product", label: "Nivea Body Lotion 400ml" },
+      { type: "Product", label: "Dove Body Lotion 400ml" },
+      { type: "Category", label: "Personal Care" },
+    ],
+    relationships: ["Product hasSubstitute Product", "Product partOf Category"],
+    kpis: [
+      { label: "High-risk pairs", value: "27" },
+      { label: "Avg. substitution", value: "0.58" },
+      { label: "Cannibalized units", value: "-3.1K" },
+      { label: "Margin loss", value: "$41.2K" },
+    ],
+    sourceTable: "ft_causal.substitution_matrix",
+    modelVersion: "substitution-emb-v1.4",
+    confidence: "82%",
+    highlight: ["prod", "sub", "cat"],
+  },
+  [QUERY_TEMPLATES[3]]: {
+    query: QUERY_TEMPLATES[3],
+    entities: [
+      { type: "Customer", label: "C001 · Champion" },
+      { type: "Offer", label: "15% Regular / 20% Prime" },
+      { type: "Causal Effect", label: "Dose CATE +0.41" },
+      { type: "Constraint", label: "Supplier Cap 20%" },
+    ],
+    relationships: ["Customer respondsTo Offer", "Offer hasCATE Causal Effect", "Offer constrainedBy Constraint"],
+    kpis: [
+      { label: "Dose CATE", value: "+0.41" },
+      { label: "Expected NIM", value: "$2.10" },
+      { label: "Effective cap", value: "20%" },
+      { label: "Optimizer choice", value: "15% / 20%" },
+    ],
+    sourceTable: "ft_optimizer.offer_decision_log",
+    modelVersion: "optimizer-milp-v3.1",
+    confidence: "89%",
+    highlight: ["cust", "offer", "cate", "constraint"],
+  },
+  [QUERY_TEMPLATES[4]]: {
+    query: QUERY_TEMPLATES[4],
+    entities: [
+      { type: "Campaign", label: "Flash Sale Q3, OTC Reactivation" },
+      { type: "Causal Effect", label: "Positive exposure CATE" },
+      { type: "Incrementality Result", label: "Negative NIM" },
+    ],
+    relationships: ["Campaign measuredBy Incrementality Result", "Offer hasCATE Causal Effect"],
+    kpis: [
+      { label: "Campaigns matched", value: "2" },
+      { label: "Avg. CATE", value: "+0.22" },
+      { label: "Avg. NIM", value: "-$0.34" },
+      { label: "Root cause", value: "Pull-forward 18%" },
+    ],
+    sourceTable: "ft_measurement.campaign_incrementality",
+    modelVersion: "causal-dml-v2.7",
+    confidence: "84%",
+    highlight: ["camp", "cate", "incr"],
+  },
+  [QUERY_TEMPLATES[5]]: {
+    query: QUERY_TEMPLATES[5],
+    entities: [
+      { type: "Customer", label: "42,118 customers" },
+      { type: "Segment", label: "Loyalist, Replenishment" },
+      { type: "Causal Effect", label: "CATE ≈ 0" },
+    ],
+    relationships: ["Customer belongsTo Segment", "Customer respondsTo Offer", "Offer hasCATE Causal Effect"],
+    kpis: [
+      { label: "Customers matched", value: "42,118" },
+      { label: "Avg. baseline units", value: "1.14" },
+      { label: "Avg. CATE", value: "+0.02" },
+      { label: "Margin at risk", value: "$212K" },
+    ],
+    sourceTable: "ft_causal.baseline_propensity_v3",
+    modelVersion: "baseline-gbm-v4.2",
+    confidence: "91%",
+    highlight: ["cust", "seg", "cate"],
+  },
+  [QUERY_TEMPLATES[6]]: {
+    query: QUERY_TEMPLATES[6],
+    entities: [
+      { type: "Category", label: "Personal Care" },
+      { type: "Product", label: "312 SKUs" },
+      { type: "Campaign", label: "Mid-Year Reactivation, Summer Boost" },
+    ],
+    relationships: ["Product partOf Category", "Category targetedBy Campaign", "Campaign contains Offer"],
+    kpis: [
+      { label: "SKUs linked", value: "312" },
+      { label: "Active offers", value: "86" },
+      { label: "Avg. depth", value: "14.8%" },
+      { label: "Expected NIM", value: "$318K" },
+    ],
+    sourceTable: "ft_master.product_category_map",
+    modelVersion: "ontology-v3.0",
+    confidence: "97%",
+    highlight: ["cat", "prod", "camp", "offer"],
+  },
+  [QUERY_TEMPLATES[7]]: {
+    query: QUERY_TEMPLATES[7],
+    entities: [
+      { type: "Product", label: "Nivea Body Lotion 400ml" },
+      { type: "Product", label: "Eucerin Sun Fluid SPF50" },
+      { type: "Channel", label: "eCommerce" },
+    ],
+    relationships: ["Product hasCompetitorPrice Reference", "Product soldVia Channel"],
+    kpis: [
+      { label: "SKUs with gap", value: "148" },
+      { label: "Avg. price gap", value: "-4.6%" },
+      { label: "Mapping coverage", value: "84.1%" },
+      { label: "Revenue exposed", value: "$1.1M" },
+    ],
+    sourceTable: "ft_market.competitor_price_daily",
+    modelVersion: "price-match-v2.2",
+    confidence: "79%",
+    highlight: ["prod", "chan"],
+  },
+};
+
+export const CAUSAL_TRACE_STEPS = [
+  { step: "Customer", detail: "C001 · Champion segment, Premium Loyal cluster", finding: "High product affinity (0.81) with Personal Care." },
+  { step: "Affinity", detail: "Nivea Body Lotion 400ml", finding: "Repeat purchaser — 6 buys in the last 12 months." },
+  { step: "Baseline", detail: "0.82 units without promotion", finding: "Baseline demand is low/moderate — headroom exists." },
+  { step: "CATE", detail: "Exposure +0.06 · Dose +0.41", finding: "Exposure CATE is positive; dose effect dominates." },
+  { step: "Response Curve", detail: "Personal Care · Premium Loyal", finding: "Dose CATE peaks between 15% and 20% depth." },
+  { step: "Cannibalization", detail: "Dove Body Lotion 400ml", finding: "Moderate substitution risk — 20% rate, $400 margin loss." },
+  { step: "Pull-Forward", detail: "9.4% of promo volume", finding: "Pull-forward risk is low for this purchase cycle." },
+  { step: "NIM", detail: "$2.10 per targeted customer", finding: "Net incremental margin is positive after all corrections." },
+  { step: "Constraint", detail: "Supplier Agreement cap 20%", finding: "Supplier limit prevents a deeper discount than 20%." },
+  { step: "Optimizer", detail: "MILP under budget + constraint set", finding: "Selected 15% Regular / 20% Prime as the optimal package." },
+  { step: "Recommendation", detail: "15% Regular / 20% Prime", finding: "Needs Discount: YES · Confidence High." },
+];
