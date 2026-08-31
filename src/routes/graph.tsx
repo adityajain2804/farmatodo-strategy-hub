@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Play, Search, Sparkles, X } from "lucide-react";
-import { AppShell } from "@/components/layout/AppShell";
 import { FilterBar, type FilterDef } from "@/components/common/FilterBar";
 import { Hint, KpiCard, Panel, StatusPill } from "@/components/common/primitives";
 import { GRAPH_LEGEND, LEGEND_DOT, OntologyGraph } from "@/components/graph/OntologyGraph";
@@ -74,7 +73,7 @@ function KnowledgeGraph() {
   };
 
   return (
-    <AppShell>
+    <>
       <div className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -341,6 +340,6 @@ function KnowledgeGraph() {
           </div>
         </SheetContent>
       </Sheet>
-    </AppShell>
+    </>
   );
 }
