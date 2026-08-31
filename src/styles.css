@@ -92,6 +92,8 @@
   --danger-foreground: oklch(0.99 0 0);
   --danger-soft: oklch(0.96 0.035 25);
   --info-soft: oklch(0.965 0.025 255);
+  --violet: oklch(0.52 0.18 300);
+  --violet-soft: oklch(0.965 0.03 300);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
