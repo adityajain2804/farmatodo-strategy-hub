@@ -267,22 +267,21 @@ function CampaignStudio() {
           bodyClassName="p-0"
         >
           <div className="overflow-auto">
-            <table className="w-full min-w-[900px] border-collapse text-xs">
+            <table className="w-full min-w-[760px] border-collapse text-[11px]">
               <thead className="bg-surface-muted/70">
                 <tr>
                   {[
                     "Product / SKU",
                     "Cohort",
-                    "Base Units",
-                    "Depths (Reg/Prime)",
-                    "Causal Lift",
-                    "Pull-Fwd",
-                    "Cannib.",
+                    "Base",
+                    "Depths",
+                    "Lift",
+                    "Erosion (PF / Cann.)",
                     "NIM",
                     "Decision",
                     "Action",
                   ].map((h) => (
-                    <th key={h} className="border-b border-border px-2.5 py-2 text-left font-medium whitespace-nowrap text-muted-foreground">
+                    <th key={h} className="border-b border-border px-2 py-2 text-left font-medium whitespace-nowrap text-muted-foreground">
                       {h}
                     </th>
                   ))}
