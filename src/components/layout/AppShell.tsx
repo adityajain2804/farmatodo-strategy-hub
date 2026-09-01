@@ -15,12 +15,13 @@ import { COUNTRIES } from "@/data/mock";
 import type { ReactNode } from "react";
 
 const NAV = [
-  { to: "/", label: "Spot Planning" },
-  { to: "/scenario", label: "Scenario Engine" },
-  { to: "/causal", label: "Causal Layer" },
-  { to: "/campaign", label: "Campaign Planning" },
+  { to: "/", label: "Campaign Studio" },
+  { to: "/causal", label: "Causal Deep-Dive" },
+  { to: "/campaign", label: "Post-Campaign Measurement & Audit" },
   { to: "/graph", label: "Knowledge Graph" },
 ] as const;
+
+const COUNTRY_RULES: Record<string, string> = { Colombia: "INVIMA Rules", Venezuela: "SUNDDE Rules" };
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { filters, set } = useGlobalFilters();
