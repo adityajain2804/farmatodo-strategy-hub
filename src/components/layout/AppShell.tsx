@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, ChevronDown, CircleDot } from "lucide-react";
+import { Bell, CalendarClock, ChevronDown, CircleDot } from "lucide-react";
 import logo from "@/assets/ct-logo.png.asset.json";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -15,12 +15,13 @@ import { COUNTRIES } from "@/data/mock";
 import type { ReactNode } from "react";
 
 const NAV = [
-  { to: "/", label: "Spot Planning" },
-  { to: "/scenario", label: "Scenario Engine" },
-  { to: "/causal", label: "Causal Layer" },
-  { to: "/campaign", label: "Campaign Planning" },
+  { to: "/", label: "Campaign Studio" },
+  { to: "/causal", label: "Causal Deep-Dive" },
+  { to: "/campaign", label: "Post-Campaign Measurement & Audit" },
   { to: "/graph", label: "Knowledge Graph" },
 ] as const;
+
+const COUNTRY_RULES: Record<string, string> = { Colombia: "INVIMA Rules", Venezuela: "SUNDDE Rules" };
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { filters, set } = useGlobalFilters();
@@ -33,21 +34,26 @@ export function AppShell({ children }: { children: ReactNode }) {
             <img src={logo.url} alt="FarmaTodo Promotion Intelligence Studio logo" className="h-9 w-9 shrink-0 rounded-lg" />
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold tracking-tight">FarmaTodo Promotion Intelligence Studio</div>
-              <div className="truncate text-[11px] tracking-wide text-muted-foreground uppercase">CXO Strategy Planner</div>
+              <div className="truncate text-[11px] tracking-wide text-muted-foreground uppercase">
+                CXO Strategy &amp; Campaign Planning Workspace
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-md border border-success/25 bg-success-soft px-2 py-1 text-[11px] font-semibold text-success">
               <CircleDot className="h-3 w-3" /> LIVE
             </span>
+            <span className="hidden rounded-md border border-border bg-surface-muted px-2 py-1 text-[11px] text-muted-foreground xl:inline">
+              Engine Mode: <b className="font-semibold text-foreground">Phase 1 Rules + Phase 2 Causal ML</b>
+            </span>
             <Select value={filters.country} onValueChange={(v) => set("country", v)}>
-              <SelectTrigger className="h-8 w-[150px] bg-surface text-xs">
+              <SelectTrigger className="h-8 w-[220px] bg-surface text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {Object.keys(COUNTRIES).map((c) => (
                   <SelectItem key={c} value={c} className="text-xs">
-                    {c} · {COUNTRIES[c as keyof typeof COUNTRIES].currency}
+                    {c} ({COUNTRIES[c as keyof typeof COUNTRIES].currency} · {COUNTRY_RULES[c]})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -84,6 +90,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="flex items-center gap-1 overflow-x-auto px-5">
+          <span className="order-last ml-auto hidden shrink-0 items-center gap-1.5 self-center rounded-md border border-warning/35 bg-warning-soft px-2 py-1 text-[11px] font-semibold text-warning-foreground lg:inline-flex">
+            <CalendarClock className="h-3 w-3" /> Planning Cutoff: 15 Jun · Campaign Start: 30 Jun (Locked)
+          </span>
           {NAV.map((n) => (
             <Link
               key={n.to}
