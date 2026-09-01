@@ -90,6 +90,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="flex items-center gap-1 overflow-x-auto px-5">
+          <span className="order-last ml-auto hidden shrink-0 items-center gap-1.5 self-center rounded-md border border-warning/35 bg-warning-soft px-2 py-1 text-[11px] font-semibold text-warning-foreground lg:inline-flex">
+            <CalendarClock className="h-3 w-3" /> Planning Cutoff: 15 Jun · Campaign Start: 30 Jun (Locked)
+          </span>
           {NAV.map((n) => (
             <Link
               key={n.to}
