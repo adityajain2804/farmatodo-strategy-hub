@@ -34,7 +34,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <img src={logo.url} alt="FarmaTodo Promotion Intelligence Studio logo" className="h-9 w-9 shrink-0 rounded-lg" />
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold tracking-tight">FarmaTodo Promotion Intelligence Studio</div>
-              <div className="truncate text-[11px] tracking-wide text-muted-foreground uppercase">CXO Strategy Planner</div>
+              <div className="truncate text-[11px] tracking-wide text-muted-foreground uppercase">
+                CXO Strategy &amp; Campaign Planning Workspace
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
