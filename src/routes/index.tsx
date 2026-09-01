@@ -296,35 +296,36 @@ function CampaignStudio() {
                       selected?.p.sku === r.p.sku ? "bg-info-soft" : ""
                     }`}
                   >
-                    <td className="px-2.5 py-2 whitespace-nowrap">
+                    <td className="px-2 py-2 whitespace-nowrap">
                       <div className="font-medium">{r.p.name}</div>
                       <div className="text-[10px] text-muted-foreground">{r.p.sku} · {r.p.category}</div>
                     </td>
-                    <td className="px-2.5 py-2 whitespace-nowrap text-muted-foreground">
-                      Cluster {r.p.cluster} | {r.p.prime ? "Prime" : "Non-Prime"}
+                    <td className="px-2 py-2 whitespace-nowrap text-muted-foreground">
+                      {r.p.cluster} | {r.p.prime ? "Prime" : "Non-Prime"}
                     </td>
-                    <td className="px-2.5 py-2 tabular-nums">{r.baseUnits.toLocaleString()}</td>
-                    <td className="px-2.5 py-2 tabular-nums">
+                    <td className="px-2 py-2 tabular-nums">{r.baseUnits.toLocaleString()}</td>
+                    <td className="px-2 py-2 whitespace-nowrap tabular-nums">
                       {r.regular}% / {r.prime}%
                       {r.clamped && <span className="ml-1 text-warning-foreground">▲</span>}
                     </td>
-                    <td className="px-2.5 py-2 font-medium tabular-nums text-success">+{fmtUnits(r.liftUnits)}</td>
-                    <td className="px-2.5 py-2 tabular-nums text-danger">{fmtMoney(r.pullForward, sym)}</td>
-                    <td className="px-2.5 py-2 tabular-nums text-danger">{fmtMoney(r.cannibal, sym)}</td>
-                    <td className={`px-2.5 py-2 font-semibold tabular-nums ${r.nim >= 0 ? "text-success" : "text-danger"}`}>
+                    <td className="px-2 py-2 font-medium tabular-nums text-success">+{fmtUnits(r.liftUnits)}</td>
+                    <td className="px-2 py-2 whitespace-nowrap tabular-nums text-danger">
+                      {fmtMoney(r.pullForward, sym)} / {fmtMoney(r.cannibal, sym)}
+                    </td>
+                    <td className={`px-2 py-2 font-semibold tabular-nums ${r.nim >= 0 ? "text-success" : "text-danger"}`}>
                       {r.nim >= 0 ? "+" : ""}
                       {fmtMoney(r.nim, sym)}
                     </td>
-                    <td className="px-2.5 py-2">
+                    <td className="px-2 py-2">
                       {r.decision ? (
-                        <StatusPill tone="pass">YES (Needs Promo)</StatusPill>
+                        <StatusPill tone="pass">YES</StatusPill>
                       ) : (
-                        <StatusPill tone="neutral">NO OFFER (Giveaway Avoided)</StatusPill>
+                        <StatusPill tone="neutral">NO OFFER</StatusPill>
                       )}
                     </td>
-                    <td className="px-2.5 py-2" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-2 py-2" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
-                        <Button size="sm" variant="outline" className="h-6 px-2 text-[11px]" onClick={() => setOverrideRow(r.p.sku)}>
+                        <Button size="sm" variant="outline" className="h-6 px-2 text-[10px]" onClick={() => setOverrideRow(r.p.sku)}>
                           Override
                         </Button>
                         <Checkbox
