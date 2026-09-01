@@ -342,7 +342,7 @@ function CampaignStudio() {
                 ))}
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="px-3 py-10 text-center text-muted-foreground">
+                    <td colSpan={9} className="px-3 py-10 text-center text-muted-foreground">
                       No SKUs match this cohort selection.
                     </td>
                   </tr>
