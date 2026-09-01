@@ -43,14 +43,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="inline-flex items-center gap-1.5 rounded-md border border-success/25 bg-success-soft px-2 py-1 text-[11px] font-semibold text-success">
               <CircleDot className="h-3 w-3" /> LIVE
             </span>
+            <span className="hidden rounded-md border border-border bg-surface-muted px-2 py-1 text-[11px] text-muted-foreground xl:inline">
+              Engine Mode: <b className="font-semibold text-foreground">Phase 1 Rules + Phase 2 Causal ML</b>
+            </span>
             <Select value={filters.country} onValueChange={(v) => set("country", v)}>
-              <SelectTrigger className="h-8 w-[150px] bg-surface text-xs">
+              <SelectTrigger className="h-8 w-[220px] bg-surface text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {Object.keys(COUNTRIES).map((c) => (
                   <SelectItem key={c} value={c} className="text-xs">
-                    {c} · {COUNTRIES[c as keyof typeof COUNTRIES].currency}
+                    {c} ({COUNTRIES[c as keyof typeof COUNTRIES].currency} · {COUNTRY_RULES[c]})
                   </SelectItem>
                 ))}
               </SelectContent>
