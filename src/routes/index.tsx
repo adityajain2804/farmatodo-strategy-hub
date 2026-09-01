@@ -116,21 +116,23 @@ function CampaignStudio() {
   }, [rows]);
 
   const stages: WaterfallStage[] = useMemo(() => {
-    const scope = selected;
+    const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+    const k = selected ? clamp(selected.cate / 0.9, 0.45, 1.6) : 1;
+    const intent = selected ? clamp(selected.p.organicIntent / 0.4, 0.5, 1.7) : 1;
     const base = 459000;
-    const uplift = scope ? Math.max(4000, scope.liftUnits * scope.p.price * 8) : 82000;
-    const giveaway = scope ? -Math.abs(scope.pullForward) * 9 : -24000;
-    const pull = scope ? -Math.abs(scope.pullForward) * 5 : -12000;
-    const cann = scope ? -Math.abs(scope.cannibal) * 7 : -8000;
+    const uplift = Math.round(82000 * k);
+    const giveaway = -Math.round(24000 * intent * k);
+    const pull = -Math.round(12000 * intent);
+    const cann = -Math.round(8000 * k);
     const fixed = -5000;
     return [
-      { name: "Base Revenue", value: base, kind: "base" },
-      { name: "Gross Promo Uplift", value: uplift, kind: "pos" },
-      { name: "Baseline Giveaway", value: giveaway, kind: "neg" },
-      { name: "Pull-Forward Dip", value: pull, kind: "neg" },
-      { name: "Cannibalization", value: cann, kind: "neg" },
-      { name: "Fixed Campaign Cost", value: fixed, kind: "neg" },
-      { name: "Net Incremental", value: base + uplift + giveaway + pull + cann + fixed, kind: "total" },
+      { name: "Base", value: base, kind: "base" },
+      { name: "Uplift", value: uplift, kind: "pos" },
+      { name: "Giveaway", value: giveaway, kind: "neg" },
+      { name: "Pull-Fwd", value: pull, kind: "neg" },
+      { name: "Cannib.", value: cann, kind: "neg" },
+      { name: "Fixed Cost", value: fixed, kind: "neg" },
+      { name: "Net", value: base + uplift + giveaway + pull + cann + fixed, kind: "total" },
     ];
   }, [selected]);
 
